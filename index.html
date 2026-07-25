@@ -86,6 +86,38 @@
     background:var(--line);
   }
 
+  .quick-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:16px;
+  }
+  .mini-card{
+    margin-bottom:0;
+    padding:16px 14px 18px;
+  }
+  .mini-card input[type=number]{
+    width:100%;
+    text-align:center;
+    font-size:18px;
+    padding:10px 8px;
+  }
+  .mini-result-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    margin-top:10px;
+    flex-wrap:wrap;
+  }
+  .mini-result-row .unit{
+    width:auto;
+  }
+  .mini-result-row .result{
+    flex:none;
+    font-size:17px;
+  }
+
   .row{
     display:flex;
     align-items:center;
@@ -326,23 +358,25 @@
 
   <button id="installBtn">📲 홈 화면에 추가하기</button>
 
-  <div class="card">
-    <div class="card-label">Inch → cm</div>
-    <div class="row">
+  <div class="quick-grid">
+    <div class="card mini-card">
+      <div class="card-label">Inch → cm</div>
       <input type="number" id="inch" value="1" step="any" inputmode="decimal">
-      <span class="unit">in</span>
-      <span class="arrow">→</span>
-      <span class="result" id="cmResult">2.54</span>
+      <div class="mini-result-row">
+        <span class="unit">in</span>
+        <span class="arrow">→</span>
+        <span class="result" id="cmResult">2.54</span>
+      </div>
     </div>
-  </div>
 
-  <div class="card">
-    <div class="card-label">Pound → kg</div>
-    <div class="row">
+    <div class="card mini-card">
+      <div class="card-label">Pound → kg</div>
       <input type="number" id="lb" value="1" step="any" inputmode="decimal">
-      <span class="unit">lb</span>
-      <span class="arrow">→</span>
-      <span class="result" id="kgResult">0.4536</span>
+      <div class="mini-result-row">
+        <span class="unit">lb</span>
+        <span class="arrow">→</span>
+        <span class="result" id="kgResult">0.4536</span>
+      </div>
     </div>
   </div>
 
@@ -361,18 +395,12 @@
       <span class="unit">kg</span>
     </div>
 
-    <div class="field-label">치수 단위</div>
-    <div class="toggle-group">
-      <button type="button" class="toggle-btn active" id="unitCm">cm</button>
-      <button type="button" class="toggle-btn" id="unitIn">in (자동환산)</button>
-    </div>
-
-    <div class="field-label">가로 × 세로 × 높이</div>
+    <div class="field-label">가로 × 세로 × 높이 (cm)</div>
     <div class="dim-labels"><span>가로</span><span>세로</span><span>높이</span></div>
     <div class="dim-grid">
-      <input type="text" id="dimL" value="30" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
-      <input type="text" id="dimW" value="20" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
-      <input type="text" id="dimH" value="15" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
+      <input type="text" id="dimL" value="1" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
+      <input type="text" id="dimW" value="1" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
+      <input type="text" id="dimH" value="1" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
     </div>
 
     <div class="field-label">부피중량 계수</div>
@@ -468,11 +496,8 @@ const billableBasis = document.getElementById('billableBasis');
 const carrierTag = document.getElementById('carrierTag');
 const carrierDhlBtn = document.getElementById('carrierDhl');
 const carrierFedexBtn = document.getElementById('carrierFedex');
-const unitCmBtn = document.getElementById('unitCm');
-const unitInBtn = document.getElementById('unitIn');
 
 let carrier = 'DHL'; // 'DHL' | 'FEDEX'
-let dimUnit = 'cm';  // 'cm' | 'in'
 
 function setCarrier(c){
   carrier = c;
@@ -482,30 +507,6 @@ function setCarrier(c){
 }
 carrierDhlBtn.addEventListener('click', () => setCarrier('DHL'));
 carrierFedexBtn.addEventListener('click', () => setCarrier('FEDEX'));
-
-function setUnit(u){
-  if (u === dimUnit) return;
-  // convert currently entered values so the physical size stays the same
-  [dimL, dimW, dimH].forEach((el) => {
-    const v = parseFloat(el.value);
-    if (!isFinite(v)) return;
-    if (u === 'in') {
-      el.value = round4(v / 2.54); // cm -> in
-    } else {
-      el.value = round4(v * 2.54); // in -> cm
-    }
-  });
-  dimUnit = u;
-  unitCmBtn.classList.toggle('active', u === 'cm');
-  unitInBtn.classList.toggle('active', u === 'in');
-  updateVolumetric();
-}
-unitCmBtn.addEventListener('click', () => setUnit('cm'));
-unitInBtn.addEventListener('click', () => setUnit('in'));
-
-function round4(n){
-  return Math.round(n * 10000) / 10000;
-}
 
 // 반올림: DHL/FedEx 청구무게 규칙
 function billableRound(weightKg, carrierName){
@@ -530,11 +531,7 @@ function updateVolumetric(){
   const div = parseFloat(divisor.value) || 5000;
   const actual = parseFloat(actualWeight.value) || 0;
 
-  // 계산은 항상 cm 기준이어야 하므로, in 모드면 cm으로 환산
-  const toCm = (v) => (dimUnit === 'in' ? v * 2.54 : v);
-  const lCm = toCm(l), wCm = toCm(w), hCm = toCm(h);
-
-  const volWeight = (lCm * wCm * hCm) / div;
+  const volWeight = (l * w * h) / div;
   const volWeightRounded = billableRound(volWeight, carrier);
 
   volWeightResult.textContent = fmt(volWeight) + " kg";
