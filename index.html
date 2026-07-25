@@ -91,7 +91,8 @@
     align-items:center;
     gap:14px;
   }
-  input[type=number]{
+  input[type=number],
+  .dim-grid input[type=text]{
     flex:1;
     background:var(--bg);
     border:1px solid var(--line);
@@ -103,7 +104,8 @@
     width:0;
     min-width:0;
   }
-  input[type=number]:focus{
+  input[type=number]:focus,
+  .dim-grid input[type=text]:focus{
     outline:none;
     border-color:var(--accent);
   }
@@ -206,14 +208,16 @@
     grid-template-columns:1fr 1fr 1fr;
     gap:10px;
   }
-  .dim-grid input[type=number]{
-    font-size:20px;
+  .dim-grid input{
+    width:100%;
+    font-size:22px;
     text-align:center;
-    padding:12px 4px;
+    padding:14px 4px;
+    line-height:1.2;
     -moz-appearance:textfield;
   }
-  .dim-grid input[type=number]::-webkit-outer-spin-button,
-  .dim-grid input[type=number]::-webkit-inner-spin-button{
+  .dim-grid input::-webkit-outer-spin-button,
+  .dim-grid input::-webkit-inner-spin-button{
     -webkit-appearance:none;
     margin:0;
   }
@@ -362,9 +366,9 @@
     <div class="field-label">가로 × 세로 × 높이</div>
     <div class="dim-labels"><span>가로</span><span>세로</span><span>높이</span></div>
     <div class="dim-grid">
-      <input type="number" id="dimL" value="30" step="any" inputmode="decimal">
-      <input type="number" id="dimW" value="20" step="any" inputmode="decimal">
-      <input type="number" id="dimH" value="15" step="any" inputmode="decimal">
+      <input type="text" id="dimL" value="30" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
+      <input type="text" id="dimW" value="20" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
+      <input type="text" id="dimH" value="15" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*">
     </div>
 
     <div class="field-label">부피중량 계수</div>
