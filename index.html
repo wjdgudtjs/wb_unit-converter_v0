@@ -387,8 +387,8 @@
         <div class="val" id="volWeightResult">–</div>
       </div>
       <div class="summary-box">
-        <div class="tag">실중량</div>
-        <div class="val" id="actualWeightResult">–</div>
+        <div class="tag" id="volWeightRoundedTag">부피중량(DHL 반올림)</div>
+        <div class="val" id="volWeightRoundedResult">–</div>
       </div>
     </div>
 
@@ -461,7 +461,8 @@ const dimH = document.getElementById('dimH');
 const divisor = document.getElementById('divisor');
 const actualWeight = document.getElementById('actualWeight');
 const volWeightResult = document.getElementById('volWeightResult');
-const actualWeightResult = document.getElementById('actualWeightResult');
+const volWeightRoundedResult = document.getElementById('volWeightRoundedResult');
+const volWeightRoundedTag = document.getElementById('volWeightRoundedTag');
 const billableResult = document.getElementById('billableResult');
 const billableBasis = document.getElementById('billableBasis');
 const carrierTag = document.getElementById('carrierTag');
@@ -534,9 +535,11 @@ function updateVolumetric(){
   const lCm = toCm(l), wCm = toCm(w), hCm = toCm(h);
 
   const volWeight = (lCm * wCm * hCm) / div;
+  const volWeightRounded = billableRound(volWeight, carrier);
 
   volWeightResult.textContent = fmt(volWeight) + " kg";
-  actualWeightResult.textContent = fmt(actual) + " kg";
+  volWeightRoundedTag.textContent = `부피중량(${carrier === 'DHL' ? 'DHL' : 'FedEx'} 반올림)`;
+  volWeightRoundedResult.textContent = fmt(volWeightRounded) + " kg";
 
   const rawBillable = Math.max(volWeight, actual);
   const billable = billableRound(rawBillable, carrier);
