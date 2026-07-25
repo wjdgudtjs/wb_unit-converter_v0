@@ -107,6 +107,14 @@
     outline:none;
     border-color:var(--accent);
   }
+  input[type=number]{
+    -moz-appearance:textfield;
+  }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+  }
   .unit{
     font-size:12px;
     color:var(--text-muted);
@@ -163,6 +171,129 @@
     margin-top:10px;
   }
 
+  .toggle-group{
+    display:flex;
+    gap:6px;
+  }
+  .toggle-btn{
+    flex:1;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--text-muted);
+    font-family:var(--sans);
+    font-size:12.5px;
+    font-weight:600;
+    padding:8px 6px;
+    border-radius:7px;
+    cursor:pointer;
+  }
+  .toggle-btn.active{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+    color:var(--accent);
+  }
+
+  .field-label{
+    font-size:11px;
+    color:var(--text-muted);
+    margin-bottom:6px;
+    margin-top:14px;
+  }
+  .field-label:first-of-type{ margin-top:0; }
+
+  .dim-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:10px;
+  }
+  .dim-grid input[type=number]{
+    font-size:20px;
+    text-align:center;
+    padding:12px 4px;
+    -moz-appearance:textfield;
+  }
+  .dim-grid input[type=number]::-webkit-outer-spin-button,
+  .dim-grid input[type=number]::-webkit-inner-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+  }
+  .dim-labels{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:8px;
+    margin-bottom:4px;
+  }
+  .dim-labels span{
+    font-size:10.5px;
+    color:var(--text-muted);
+    text-align:center;
+  }
+
+  select{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:var(--sans);
+    font-size:14px;
+    padding:9px 10px;
+    border-radius:8px;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  select:focus{ outline:none; border-color:var(--accent); }
+
+  .summary-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:16px;
+  }
+  .summary-box{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px;
+    text-align:center;
+  }
+  .summary-box .tag{
+    font-size:10px;
+    color:var(--text-muted);
+    letter-spacing:0.04em;
+  }
+  .summary-box .val{
+    font-family:var(--mono);
+    font-size:16px;
+    font-weight:600;
+    margin-top:4px;
+  }
+  .final-box{
+    margin-top:10px;
+    background:var(--accent-soft);
+    border:1px solid var(--accent);
+    border-radius:8px;
+    padding:14px;
+    text-align:center;
+  }
+  .final-box .tag{
+    font-size:11px;
+    color:var(--accent);
+    letter-spacing:0.06em;
+    font-weight:600;
+  }
+  .final-box .val{
+    font-family:var(--mono);
+    font-size:26px;
+    font-weight:700;
+    color:var(--accent);
+    margin-top:4px;
+  }
+  .final-box .basis{
+    font-size:10.5px;
+    color:var(--text-muted);
+    margin-top:2px;
+  }
+
   #installBtn{
     display:none;
     width:100%;
@@ -183,7 +314,7 @@
 <div class="wrap">
   <div class="ticks"></div>
   <h1>변환 계산기</h1>
-  <div class="sub">인치·파운드 변환, 증감 30% 계산을 한 화면에서</div>
+  <div class="sub">인치·파운드 변환, 부피중량·청구무게, 증감 30% 계산을 한 화면에서</div>
 
   <button id="installBtn">📲 홈 화면에 추가하기</button>
 
@@ -204,6 +335,59 @@
       <span class="unit">lb</span>
       <span class="arrow">→</span>
       <span class="result" id="kgResult">0.4536</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">부피중량 · 청구무게</div>
+
+    <div class="field-label">운송사</div>
+    <div class="toggle-group">
+      <button type="button" class="toggle-btn active" id="carrierDhl">DHL</button>
+      <button type="button" class="toggle-btn" id="carrierFedex">FedEx</button>
+    </div>
+
+    <div class="field-label">실중량 (kg)</div>
+    <div class="row">
+      <input type="number" id="actualWeight" value="4" step="any" inputmode="decimal">
+      <span class="unit">kg</span>
+    </div>
+
+    <div class="field-label">치수 단위</div>
+    <div class="toggle-group">
+      <button type="button" class="toggle-btn active" id="unitCm">cm</button>
+      <button type="button" class="toggle-btn" id="unitIn">in (자동환산)</button>
+    </div>
+
+    <div class="field-label">가로 × 세로 × 높이</div>
+    <div class="dim-labels"><span>가로</span><span>세로</span><span>높이</span></div>
+    <div class="dim-grid">
+      <input type="number" id="dimL" value="30" step="any" inputmode="decimal">
+      <input type="number" id="dimW" value="20" step="any" inputmode="decimal">
+      <input type="number" id="dimH" value="15" step="any" inputmode="decimal">
+    </div>
+
+    <div class="field-label">부피중량 계수</div>
+    <select id="divisor">
+      <option value="5000">÷5000 (특송 기본)</option>
+      <option value="6000">÷6000 (항공화물 기준)</option>
+    </select>
+
+    <div class="summary-grid">
+      <div class="summary-box">
+        <div class="tag">부피중량</div>
+        <div class="val" id="volWeightResult">–</div>
+      </div>
+      <div class="summary-box">
+        <div class="tag">실중량</div>
+        <div class="val" id="actualWeightResult">–</div>
+      </div>
+    </div>
+
+    <div class="final-box">
+      <div class="tag" id="carrierTag">DHL 청구무게</div>
+      <div class="val" id="billableResult">–</div>
+      <div class="basis" id="billableBasis"></div>
     </div>
   </div>
 
@@ -261,6 +445,106 @@ function updateDelta(){
 base.addEventListener('input', updateDelta);
 
 updateInch(); updateLb(); updateDelta();
+
+// ---- 부피중량 · 청구무게 계산기 ----
+const dimL = document.getElementById('dimL');
+const dimW = document.getElementById('dimW');
+const dimH = document.getElementById('dimH');
+const divisor = document.getElementById('divisor');
+const actualWeight = document.getElementById('actualWeight');
+const volWeightResult = document.getElementById('volWeightResult');
+const actualWeightResult = document.getElementById('actualWeightResult');
+const billableResult = document.getElementById('billableResult');
+const billableBasis = document.getElementById('billableBasis');
+const carrierTag = document.getElementById('carrierTag');
+const carrierDhlBtn = document.getElementById('carrierDhl');
+const carrierFedexBtn = document.getElementById('carrierFedex');
+const unitCmBtn = document.getElementById('unitCm');
+const unitInBtn = document.getElementById('unitIn');
+
+let carrier = 'DHL'; // 'DHL' | 'FEDEX'
+let dimUnit = 'cm';  // 'cm' | 'in'
+
+function setCarrier(c){
+  carrier = c;
+  carrierDhlBtn.classList.toggle('active', c === 'DHL');
+  carrierFedexBtn.classList.toggle('active', c === 'FEDEX');
+  updateVolumetric();
+}
+carrierDhlBtn.addEventListener('click', () => setCarrier('DHL'));
+carrierFedexBtn.addEventListener('click', () => setCarrier('FEDEX'));
+
+function setUnit(u){
+  if (u === dimUnit) return;
+  // convert currently entered values so the physical size stays the same
+  [dimL, dimW, dimH].forEach((el) => {
+    const v = parseFloat(el.value);
+    if (!isFinite(v)) return;
+    if (u === 'in') {
+      el.value = round4(v / 2.54); // cm -> in
+    } else {
+      el.value = round4(v * 2.54); // in -> cm
+    }
+  });
+  dimUnit = u;
+  unitCmBtn.classList.toggle('active', u === 'cm');
+  unitInBtn.classList.toggle('active', u === 'in');
+  updateVolumetric();
+}
+unitCmBtn.addEventListener('click', () => setUnit('cm'));
+unitInBtn.addEventListener('click', () => setUnit('in'));
+
+function round4(n){
+  return Math.round(n * 10000) / 10000;
+}
+
+// 반올림: DHL/FedEx 청구무게 규칙
+function billableRound(weightKg, carrierName){
+  if (weightKg <= 0) return 0;
+  if (carrierName === 'DHL') {
+    // 0.1~30kg: 0.5kg 단위 올림 / 30.1kg부터: 1kg 단위 올림
+    return weightKg > 30
+      ? Math.ceil(weightKg)
+      : Math.ceil(weightKg * 2) / 2;
+  } else {
+    // FedEx: 0.1~20.9kg: 0.5kg 단위 올림 / 21kg부터: 1kg 단위 올림
+    return weightKg >= 21
+      ? Math.ceil(weightKg)
+      : Math.ceil(weightKg * 2) / 2;
+  }
+}
+
+function updateVolumetric(){
+  const l = parseFloat(dimL.value) || 0;
+  const w = parseFloat(dimW.value) || 0;
+  const h = parseFloat(dimH.value) || 0;
+  const div = parseFloat(divisor.value) || 5000;
+  const actual = parseFloat(actualWeight.value) || 0;
+
+  // 계산은 항상 cm 기준이어야 하므로, in 모드면 cm으로 환산
+  const toCm = (v) => (dimUnit === 'in' ? v * 2.54 : v);
+  const lCm = toCm(l), wCm = toCm(w), hCm = toCm(h);
+
+  const volWeight = (lCm * wCm * hCm) / div;
+
+  volWeightResult.textContent = fmt(volWeight) + " kg";
+  actualWeightResult.textContent = fmt(actual) + " kg";
+
+  const rawBillable = Math.max(volWeight, actual);
+  const billable = billableRound(rawBillable, carrier);
+  const basisLabel = volWeight >= actual ? "부피중량 기준" : "실중량 기준";
+
+  carrierTag.textContent = (carrier === 'DHL' ? 'DHL' : 'FedEx') + ' 청구무게';
+  billableResult.textContent = fmt(billable) + " kg";
+  billableBasis.textContent = basisLabel + ` · 반올림 전 ${fmt(rawBillable)}kg`;
+}
+
+[dimL, dimW, dimH, divisor, actualWeight].forEach((el) => {
+  el.addEventListener('input', updateVolumetric);
+});
+divisor.addEventListener('change', updateVolumetric);
+
+updateVolumetric();
 
 // PWA install prompt (Android/Chrome)
 let deferredPrompt;
