@@ -1,4 +1,4 @@
-const CACHE_NAME = 'unit-converter-v12';
+const CACHE_NAME = 'unit-converter-v14';
 const ASSETS = [
   './',
   './index.html',

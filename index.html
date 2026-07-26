@@ -322,11 +322,14 @@
     gap:10px;
     margin-top:16px;
   }
+  .summary-grid.three-col{
+    grid-template-columns:1fr 1fr 1fr;
+  }
   .summary-box{
     background:var(--bg);
     border:1px solid var(--line);
     border-radius:8px;
-    padding:10px;
+    padding:10px 6px;
     text-align:center;
   }
   .summary-box .tag{
@@ -339,6 +342,9 @@
     font-size:16px;
     font-weight:600;
     margin-top:4px;
+  }
+  .summary-grid.three-col .summary-box .val{
+    font-size:14px;
   }
   .final-box{
     margin-top:10px;
@@ -446,7 +452,7 @@
       <option value="6000">÷6000 (항공화물 기준)</option>
     </select>
 
-    <div class="summary-grid">
+    <div class="summary-grid three-col">
       <div class="summary-box">
         <div class="tag">부피중량</div>
         <div class="val" id="volWeightResult">–</div>
@@ -454,6 +460,10 @@
       <div class="summary-box">
         <div class="tag" id="volWeightRoundedTag">부피중량(DHL 반올림)</div>
         <div class="val" id="volWeightRoundedResult">–</div>
+      </div>
+      <div class="summary-box">
+        <div class="tag">둘레 (girth)</div>
+        <div class="val" id="girthResult">–</div>
       </div>
     </div>
 
@@ -528,6 +538,7 @@ const actualWeight = document.getElementById('actualWeight');
 const volWeightResult = document.getElementById('volWeightResult');
 const volWeightRoundedResult = document.getElementById('volWeightRoundedResult');
 const volWeightRoundedTag = document.getElementById('volWeightRoundedTag');
+const girthResult = document.getElementById('girthResult');
 const billableResult = document.getElementById('billableResult');
 const billableBasis = document.getElementById('billableBasis');
 const carrierTag = document.getElementById('carrierTag');
@@ -571,8 +582,15 @@ function updateVolumetric(){
   const volWeight = (l * w * h) / div;
   const volWeightRounded = billableRound(volWeight, carrier);
 
+  const sides = [l, w, h];
+  const longest = Math.max(...sides);
+  const longestIdx = sides.indexOf(longest);
+  const others = sides.filter((_, i) => i !== longestIdx);
+  const girth = longest + 2 * (others[0] + others[1]);
+
   volWeightResult.textContent = fmt(volWeight) + " kg";
   volWeightRoundedTag.textContent = `부피중량(${carrier === 'DHL' ? 'DHL' : 'FedEx'} 반올림)`;
+  girthResult.textContent = fmt(girth) + " cm";
   volWeightRoundedResult.textContent = fmt(volWeightRounded) + " kg";
 
   const rawBillable = Math.max(volWeight, actual);
