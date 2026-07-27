@@ -176,15 +176,15 @@
 
   .delta-grid{
     display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:10px;
     margin-top:16px;
   }
   .delta-box{
     background:var(--bg);
     border:1px solid var(--line);
     border-radius:8px;
-    padding:12px;
+    padding:12px 8px;
     text-align:center;
   }
   .delta-box .tag{
@@ -200,6 +200,21 @@
   }
   .delta-box.down .val{ color:#e08a8a; }
   .delta-box.up .val{ color:#7fc9a0; }
+  .delta-box.input-box{
+    border-color:var(--accent);
+  }
+  .delta-box.input-box .tag{
+    color:var(--accent);
+  }
+  .delta-box.input-box input{
+    margin-top:4px;
+    background:transparent;
+    border:none;
+    padding:0;
+    font-size:19px;
+    font-weight:600;
+    min-height:auto;
+  }
 
   footer{
     text-align:center;
@@ -476,11 +491,11 @@
 
   <div class="card">
     <div class="card-label">±30% 증감</div>
-    <div class="row">
-      <input type="number" id="base" value="100" step="any" inputmode="decimal">
-      <span class="unit"></span>
-    </div>
     <div class="delta-grid">
+      <div class="delta-box input-box">
+        <div class="tag">기준값</div>
+        <input type="text" id="base" value="100" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*" class="num-cell">
+      </div>
       <div class="delta-box down">
         <div class="tag">30% 감소</div>
         <div class="val" id="downResult">70</div>
