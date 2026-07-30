@@ -361,6 +361,15 @@
   .summary-grid.three-col .summary-box .val{
     font-size:14px;
   }
+  .summary-box.highlight{
+    border-color:var(--accent);
+  }
+  .summary-box.highlight .tag{
+    color:var(--accent);
+  }
+  .summary-box.highlight .val{
+    color:var(--accent);
+  }
   .final-box{
     margin-top:10px;
     background:var(--accent-soft);
@@ -472,7 +481,7 @@
         <div class="tag">부피중량</div>
         <div class="val" id="volWeightResult">–</div>
       </div>
-      <div class="summary-box">
+      <div class="summary-box highlight">
         <div class="tag" id="volWeightRoundedTag">부피중량(DHL 반올림)</div>
         <div class="val" id="volWeightRoundedResult">–</div>
       </div>
