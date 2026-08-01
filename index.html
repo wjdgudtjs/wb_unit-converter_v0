@@ -277,6 +277,30 @@
     border-radius:2px;
     flex:none;
   }
+  .carrier-divisor-row{
+    display:flex;
+    gap:10px;
+    align-items:stretch;
+  }
+  .carrier-group{
+    flex:0 0 52%;
+    display:flex;
+    flex-direction:column;
+  }
+  .divisor-group{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+  }
+  .divisor-group select{
+    margin-top:auto;
+    font-size:11px;
+    padding:9px 8px;
+  }
+  .carrier-group .toggle-group{
+    margin-top:auto;
+  }
   .group-label{
     font-size:11px;
     letter-spacing:0.04em;
@@ -465,10 +489,22 @@
   <div class="card">
     <div class="card-label">부피중량 · 청구무게</div>
 
-    <div class="field-label">운송사</div>
-    <div class="toggle-group">
-      <button type="button" class="toggle-btn active" id="carrierDhl">DHL</button>
-      <button type="button" class="toggle-btn" id="carrierFedex">FedEx</button>
+    <div class="carrier-divisor-row">
+      <div class="carrier-group">
+        <div class="group-label">운송사</div>
+        <div class="toggle-group">
+          <button type="button" class="toggle-btn active" id="carrierDhl">DHL</button>
+          <button type="button" class="toggle-btn" id="carrierFedex">FedEx</button>
+        </div>
+      </div>
+      <div class="quad-divider"></div>
+      <div class="divisor-group">
+        <div class="group-label">부피중량 계수</div>
+        <select id="divisor">
+          <option value="5000">÷5000 (특송 기본)</option>
+          <option value="6000">÷6000 (항공화물 기준)</option>
+        </select>
+      </div>
     </div>
 
     <div class="quad-wrap">
@@ -499,12 +535,6 @@
         <div class="val" id="girthResult">–</div>
       </div>
     </div>
-
-    <div class="field-label">부피중량 계수</div>
-    <select id="divisor">
-      <option value="5000">÷5000 (특송 기본)</option>
-      <option value="6000">÷6000 (항공화물 기준)</option>
-    </select>
 
     <div class="summary-grid">
       <div class="summary-box highlight">
