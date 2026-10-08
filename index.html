@@ -2,19 +2,13 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>변환 계산기</title>
-
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#1b1b1f">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="변환계산기">
-<meta name="mobile-web-app-capable" content="yes">
-
+<link rel="apple-touch-icon" href="./icon-192.png">
 <style>
   :root{
     --bg:#1b1b1f;
@@ -28,7 +22,6 @@
     --sans:-apple-system,"Segoe UI","Pretendard","Noto Sans KR",sans-serif;
   }
   *{box-sizing:border-box;}
-  html, body{ height:100%; }
   body{
     margin:0;
     background:var(--bg);
@@ -36,11 +29,8 @@
     font-family:var(--sans);
     display:flex;
     justify-content:center;
-    padding:calc(48px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));
-    -webkit-tap-highlight-color:transparent;
-    user-select:none;
+    padding:48px 20px;
   }
-  input{ user-select:text; }
   .wrap{ width:100%; max-width:480px; }
 
   .ticks{
@@ -86,45 +76,13 @@
     background:var(--line);
   }
 
-  .quick-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    margin-bottom:16px;
-  }
-  .mini-card{
-    margin-bottom:0;
-    padding:16px 14px 18px;
-  }
-  .mini-card input[type=number]{
-    width:100%;
-    text-align:center;
-    font-size:18px;
-    padding:10px 8px;
-  }
-  .mini-result-row{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    margin-top:10px;
-    flex-wrap:wrap;
-  }
-  .mini-result-row .unit{
-    width:auto;
-  }
-  .mini-result-row .result{
-    flex:none;
-    font-size:17px;
-  }
-
   .row{
     display:flex;
     align-items:center;
     gap:14px;
   }
-  input[type=number],
-  input[type=text]{
+  .row input[type=number], .row input[type=text]{
+    flex:1;
     background:var(--bg);
     border:1px solid var(--line);
     color:var(--text);
@@ -132,25 +90,12 @@
     font-size:20px;
     padding:10px 12px;
     border-radius:8px;
-  }
-  .row input[type=number],
-  .row input[type=text]{
-    flex:1;
     width:0;
     min-width:0;
   }
-  input[type=number]:focus,
-  input[type=text]:focus{
+  input:focus{
     outline:none;
     border-color:var(--accent);
-  }
-  input[type=number]{
-    -moz-appearance:textfield;
-  }
-  input[type=number]::-webkit-outer-spin-button,
-  input[type=number]::-webkit-inner-spin-button{
-    -webkit-appearance:none;
-    margin:0;
   }
   .unit{
     font-size:12px;
@@ -174,17 +119,220 @@
     text-overflow:ellipsis;
   }
 
+  /* quick grid: inch / lb side by side */
+  .quick-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:16px;
+  }
+  .mini-card{
+    margin-bottom:0;
+    padding:14px 14px 16px;
+  }
+  .mini-card .card-label{
+    font-size:10px;
+    margin-bottom:10px;
+  }
+  .mini-row{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .mini-row input[type=number]{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:var(--mono);
+    font-size:16px;
+    padding:8px 10px;
+    border-radius:8px;
+  }
+  .mini-result-row{
+    display:flex;
+    align-items:baseline;
+    justify-content:flex-end;
+    gap:6px;
+  }
+  .mini-result-row .arrow{ font-size:13px; }
+  .mini-result-row .result{
+    font-size:16px;
+  }
+
+  /* carrier + divisor row */
+  .carrier-divisor-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .carrier-group{
+    flex:0 0 52%;
+    display:flex;
+    gap:6px;
+  }
+  .quad-divider{
+    width:1px;
+    align-self:stretch;
+    background:var(--line);
+    flex:none;
+  }
+  .divisor-group{
+    flex:1;
+    min-width:0;
+  }
+  .carrier-btn{
+    flex:1;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--text-muted);
+    font-size:12.5px;
+    font-weight:600;
+    padding:9px 4px;
+    border-radius:8px;
+    cursor:pointer;
+    text-align:center;
+  }
+  .carrier-btn.active{
+    border-color:var(--accent);
+    color:var(--accent);
+    background:var(--accent-soft);
+  }
+  #divisor{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-size:11px;
+    padding:9px 8px;
+    border-radius:8px;
+  }
+
+  /* weight + dims row */
+  .quad-wrap{
+    display:flex;
+    align-items:stretch;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .weight-group{
+    flex:0 0 118px;
+    min-width:0;
+  }
+  .dims-group{
+    flex:1;
+    min-width:0;
+  }
+  .group-label{
+    font-size:11px;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .num-cell{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:var(--mono);
+    font-size:18px;
+    min-height:52px;
+    padding:12px 2px;
+    border-radius:8px;
+    text-align:center;
+  }
+  .dim-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:6px;
+  }
+  .num-cell.small{
+    font-size:18px;
+    min-height:52px;
+    padding:12px 2px;
+  }
+
+  /* volumetric / girth row */
+  .vg-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .summary-box{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px;
+    text-align:center;
+  }
+  .summary-box .tag{
+    font-size:10.5px;
+    color:var(--text-muted);
+    letter-spacing:0.04em;
+  }
+  .summary-box .val{
+    font-family:var(--mono);
+    font-size:18px;
+    font-weight:600;
+    margin-top:4px;
+    color:var(--text);
+  }
+
+  .summary-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .summary-box.highlight{
+    border-color:var(--accent);
+  }
+  .summary-box.highlight .tag{
+    color:var(--accent);
+  }
+  .summary-box.highlight .val{
+    color:var(--text);
+  }
+
+  .final-box{
+    background:var(--accent-soft);
+    border:1px solid var(--accent);
+    border-radius:10px;
+    padding:16px;
+    text-align:center;
+  }
+  .final-box .tag{
+    font-size:11px;
+    color:var(--accent);
+    font-weight:600;
+    letter-spacing:0.06em;
+  }
+  .final-box .final-val{
+    font-family:var(--mono);
+    font-size:28px;
+    font-weight:700;
+    color:var(--text);
+    margin-top:6px;
+  }
+  .final-box .basis{
+    font-size:11px;
+    color:var(--text-muted);
+    margin-top:4px;
+  }
+
   .delta-grid{
     display:grid;
     grid-template-columns:1fr 1fr 1fr;
     gap:10px;
-    margin-top:16px;
+    margin-top:0;
   }
   .delta-box{
     background:var(--bg);
     border:1px solid var(--line);
     border-radius:8px;
-    padding:12px 8px;
+    padding:12px;
     text-align:center;
   }
   .delta-box .tag{
@@ -201,20 +349,20 @@
   .delta-box.down .val{ color:#e08a8a; }
   .delta-box.up .val{ color:#7fc9a0; }
   .delta-box.input-box{
-    border-color:var(--accent);
-  }
-  .delta-box.input-box .tag{
-    color:var(--accent);
+    padding:6px;
   }
   .delta-box.input-box input{
-    margin-top:4px;
+    width:100%;
     background:transparent;
     border:none;
-    padding:0;
+    color:var(--text);
+    font-family:var(--mono);
     font-size:19px;
     font-weight:600;
-    min-height:auto;
+    text-align:center;
+    padding:10px 2px;
   }
+  .delta-box.input-box input:focus{ outline:none; }
 
   footer{
     text-align:center;
@@ -222,255 +370,33 @@
     font-size:11px;
     margin-top:10px;
   }
-
-  .toggle-group{
-    display:flex;
-    gap:6px;
-  }
-  .toggle-btn{
-    flex:1;
-    background:var(--bg);
-    border:1px solid var(--line);
-    color:var(--text-muted);
-    font-family:var(--sans);
-    font-size:12.5px;
-    font-weight:600;
-    padding:8px 6px;
-    border-radius:7px;
-    cursor:pointer;
-  }
-  .toggle-btn.active{
-    background:var(--accent-soft);
-    border-color:var(--accent);
-    color:var(--accent);
-  }
-
-  .field-label{
-    font-size:11px;
-    color:var(--text-muted);
-    margin-bottom:6px;
-    margin-top:14px;
-  }
-  .field-label:first-of-type{ margin-top:0; }
-
-  .quad-wrap{
-    display:flex;
-    gap:10px;
-    margin-top:14px;
-    align-items:stretch;
-  }
-  .weight-group{
-    flex:0 0 118px;
-    display:flex;
-    flex-direction:column;
-  }
-  .dims-group{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    min-width:0;
-  }
-  .quad-divider{
-    width:2px;
-    background:var(--accent);
-    opacity:0.5;
-    border-radius:2px;
-    flex:none;
-  }
-  .carrier-divisor-row{
-    display:flex;
-    gap:10px;
-    align-items:stretch;
-  }
-  .carrier-group{
-    flex:0 0 52%;
-    display:flex;
-    flex-direction:column;
-  }
-  .divisor-group{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    min-width:0;
-  }
-  .divisor-group select{
-    margin-top:auto;
-    font-size:11px;
-    padding:9px 8px;
-  }
-  .carrier-group .toggle-group{
-    margin-top:auto;
-  }
-  .group-label{
-    font-size:11px;
-    letter-spacing:0.04em;
-    text-align:center;
-    font-weight:600;
-    margin-bottom:6px;
-    color:var(--accent);
-  }
-  .mini-tag{
-    font-size:10.5px;
-    color:var(--text-muted);
-    text-align:center;
-    margin-bottom:4px;
-  }
-  .num-cell{
-    width:100%;
-    min-height:52px;
-    font-size:18px;
-    text-align:center;
-    padding:12px 2px;
-    line-height:1.2;
-  }
-  .dim-three-labels{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:8px;
-    margin-bottom:4px;
-  }
-  .dim-three-labels span{
-    font-size:10.5px;
-    color:var(--text-muted);
-    text-align:center;
-  }
-  .dim-three-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:6px;
-    flex:1;
-  }
-  .num-cell.small{
-    min-height:52px;
-    font-size:18px;
-    padding:12px 2px;
-  }
-  .vg-row{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-top:12px;
-  }
-
-  select{
-    width:100%;
-    background:var(--bg);
-    border:1px solid var(--line);
-    color:var(--text);
-    font-family:var(--sans);
-    font-size:14px;
-    padding:9px 10px;
-    border-radius:8px;
-    -webkit-appearance:none;
-    appearance:none;
-  }
-  select:focus{ outline:none; border-color:var(--accent); }
-
-  .summary-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-top:16px;
-  }
-  .summary-grid.three-col{
-    grid-template-columns:1fr 1fr 1fr;
-  }
-  .summary-box{
-    background:var(--bg);
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:10px 6px;
-    text-align:center;
-  }
-  .summary-box .tag{
-    font-size:10px;
-    color:var(--text-muted);
-    letter-spacing:0.04em;
-  }
-  .summary-box .val{
-    font-family:var(--mono);
-    font-size:16px;
-    font-weight:600;
-    margin-top:4px;
-  }
-  .summary-grid.three-col .summary-box .val{
-    font-size:14px;
-  }
-  .summary-box.highlight{
-    border-color:var(--accent);
-  }
-  .summary-box.highlight .tag{
-    color:var(--accent);
-  }
-  .final-box{
-    margin-top:10px;
-    background:var(--accent-soft);
-    border:1px solid var(--accent);
-    border-radius:8px;
-    padding:14px;
-    text-align:center;
-  }
-  .final-box .tag{
-    font-size:11px;
-    color:var(--accent);
-    letter-spacing:0.06em;
-    font-weight:600;
-  }
-  .final-box .val{
-    font-family:var(--mono);
-    font-size:26px;
-    font-weight:700;
-    color:var(--accent);
-    margin-top:4px;
-  }
-  .final-box .basis{
-    font-size:10.5px;
-    color:var(--text-muted);
-    margin-top:2px;
-  }
-
-  #installBtn{
-    display:none;
-    width:100%;
-    margin-bottom:16px;
-    padding:12px;
-    background:var(--accent-soft);
-    border:1px solid var(--accent);
-    color:var(--accent);
-    font-family:var(--sans);
-    font-size:13px;
-    font-weight:600;
-    border-radius:8px;
-    cursor:pointer;
-  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="ticks"></div>
   <h1>변환 계산기</h1>
-  <div class="sub">인치·파운드 변환, 부피중량·청구무게, 증감 30% 계산을 한 화면에서</div>
-
-  <button id="installBtn">📲 홈 화면에 추가하기</button>
+  <div class="sub">DHL·FedEx 청구무게, 인치·파운드 변환, 증감 30% 계산을 한 화면에서</div>
 
   <div class="quick-grid">
     <div class="card mini-card">
       <div class="card-label">Inch → cm</div>
-      <input type="number" id="inch" value="1" step="any" inputmode="decimal">
-      <div class="mini-result-row">
-        <span class="unit">in</span>
-        <span class="arrow">→</span>
-        <span class="result" id="cmResult">2.54</span>
+      <div class="mini-row">
+        <input type="number" id="inch" step="any">
+        <div class="mini-result-row">
+          <span class="arrow">=</span>
+          <span class="result" id="cmResult">0 cm</span>
+        </div>
       </div>
     </div>
-
     <div class="card mini-card">
       <div class="card-label">Pound → kg</div>
-      <input type="number" id="lb" value="1" step="any" inputmode="decimal">
-      <div class="mini-result-row">
-        <span class="unit">lb</span>
-        <span class="arrow">→</span>
-        <span class="result" id="kgResult">0.4536</span>
+      <div class="mini-row">
+        <input type="number" id="lb" step="any">
+        <div class="mini-result-row">
+          <span class="arrow">=</span>
+          <span class="result" id="kgResult">0 kg</span>
+        </div>
       </div>
     </div>
   </div>
@@ -480,15 +406,11 @@
 
     <div class="carrier-divisor-row">
       <div class="carrier-group">
-        <div class="group-label">운송사</div>
-        <div class="toggle-group">
-          <button type="button" class="toggle-btn active" id="carrierDhl">DHL</button>
-          <button type="button" class="toggle-btn" id="carrierFedex">FedEx</button>
-        </div>
+        <button type="button" class="carrier-btn active" id="carrierDhl">DHL</button>
+        <button type="button" class="carrier-btn" id="carrierFedex">FedEx</button>
       </div>
       <div class="quad-divider"></div>
       <div class="divisor-group">
-        <div class="group-label">부피중량 계수</div>
         <select id="divisor">
           <option value="5000">÷5000 (특송 기본)</option>
           <option value="6000">÷6000 (항공화물 기준)</option>
@@ -498,48 +420,46 @@
 
     <div class="quad-wrap">
       <div class="weight-group">
-        <div class="group-label weight">실중량 (kg)</div>
-        <div class="mini-tag">실중량</div>
-        <input type="text" id="actualWeight" value="4" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*" class="num-cell">
+        <div class="group-label">실중량(kg)</div>
+        <input type="text" inputmode="decimal" id="actualWeight" class="num-cell">
       </div>
       <div class="quad-divider"></div>
       <div class="dims-group">
-        <div class="group-label dims">가로 × 세로 × 높이 (cm)</div>
-        <div class="dim-three-labels"><span>가로</span><span>세로</span><span>높이</span></div>
-        <div class="dim-three-grid compact">
-          <input type="text" id="dimL" value="1" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*" class="num-cell small">
-          <input type="text" id="dimW" value="1" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*" class="num-cell small">
-          <input type="text" id="dimH" value="1" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*" class="num-cell small">
+        <div class="group-label">가로 × 세로 × 높이(cm)</div>
+        <div class="dim-grid">
+          <input type="text" inputmode="decimal" id="dimL" class="num-cell small" placeholder="가로">
+          <input type="text" inputmode="decimal" id="dimW" class="num-cell small" placeholder="세로">
+          <input type="text" inputmode="decimal" id="dimH" class="num-cell small" placeholder="높이">
         </div>
       </div>
     </div>
 
     <div class="vg-row">
       <div class="summary-box">
-        <div class="tag">둘레 (girth)</div>
-        <div class="val" id="girthResult">–</div>
+        <div class="tag">둘레</div>
+        <div class="val" id="girthResult">0 cm</div>
       </div>
       <div class="summary-box">
         <div class="tag">부피중량</div>
-        <div class="val" id="volWeightResult">–</div>
+        <div class="val" id="volWeightResult">0 kg</div>
       </div>
     </div>
 
     <div class="summary-grid">
       <div class="summary-box highlight">
         <div class="tag" id="actualWeightRoundedTag">실중량(DHL 반올림)</div>
-        <div class="val" id="actualWeightRoundedResult">–</div>
+        <div class="val" id="actualWeightRoundedResult">0 kg</div>
       </div>
       <div class="summary-box highlight">
         <div class="tag" id="volWeightRoundedTag">부피중량(DHL 반올림)</div>
-        <div class="val" id="volWeightRoundedResult">–</div>
+        <div class="val" id="volWeightRoundedResult">0 kg</div>
       </div>
     </div>
 
     <div class="final-box">
       <div class="tag" id="carrierTag">DHL 청구무게</div>
-      <div class="val" id="billableResult">–</div>
-      <div class="basis" id="billableBasis"></div>
+      <div class="final-val" id="billableResult">0 kg</div>
+      <div class="basis" id="billableBasis">실중량 기준</div>
     </div>
   </div>
 
@@ -547,16 +467,15 @@
     <div class="card-label">±30% 증감</div>
     <div class="delta-grid">
       <div class="delta-box input-box">
-        <div class="tag">기준값</div>
-        <input type="text" id="base" value="100" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*" class="num-cell">
+        <input type="number" id="base" step="any">
       </div>
       <div class="delta-box down">
         <div class="tag">30% 감소</div>
-        <div class="val" id="downResult">70</div>
+        <div class="val" id="downResult">0</div>
       </div>
       <div class="delta-box up">
         <div class="tag">30% 증가</div>
-        <div class="val" id="upResult">130</div>
+        <div class="val" id="upResult">0</div>
       </div>
     </div>
   </div>
@@ -570,6 +489,7 @@ function fmt(n){
   return n.toLocaleString('ko-KR', { maximumFractionDigits: 4 });
 }
 
+// Inch -> cm
 const inch = document.getElementById('inch');
 const cmResult = document.getElementById('cmResult');
 function updateInch(){
@@ -578,6 +498,7 @@ function updateInch(){
 }
 inch.addEventListener('input', updateInch);
 
+// Lb -> kg
 const lb = document.getElementById('lb');
 const kgResult = document.getElementById('kgResult');
 function updateLb(){
@@ -586,6 +507,7 @@ function updateLb(){
 }
 lb.addEventListener('input', updateLb);
 
+// +-30%
 const base = document.getElementById('base');
 const downResult = document.getElementById('downResult');
 const upResult = document.getElementById('upResult');
@@ -596,118 +518,103 @@ function updateDelta(){
 }
 base.addEventListener('input', updateDelta);
 
-updateInch(); updateLb(); updateDelta();
+// Carrier state
+let carrier = 'DHL';
+const carrierDhl = document.getElementById('carrierDhl');
+const carrierFedex = document.getElementById('carrierFedex');
+function setCarrier(c){
+  carrier = c;
+  carrierDhl.classList.toggle('active', c === 'DHL');
+  carrierFedex.classList.toggle('active', c === 'FEDEX');
+  updateVolumetric();
+}
+carrierDhl.addEventListener('click', () => setCarrier('DHL'));
+carrierFedex.addEventListener('click', () => setCarrier('FEDEX'));
 
-// ---- 부피중량 · 청구무게 계산기 ----
+// Billable rounding rules
+function billableRound(weightKg, carrierName){
+  if (!isFinite(weightKg) || weightKg <= 0) return 0;
+  if (carrierName === 'DHL'){
+    if (weightKg <= 30){
+      return Math.ceil(weightKg / 0.5) * 0.5;
+    } else {
+      return Math.ceil(weightKg);
+    }
+  } else { // FEDEX
+    if (weightKg <= 20.9){
+      return Math.ceil(weightKg / 0.5) * 0.5;
+    } else {
+      return Math.ceil(weightKg);
+    }
+  }
+}
+
+const actualWeight = document.getElementById('actualWeight');
 const dimL = document.getElementById('dimL');
 const dimW = document.getElementById('dimW');
 const dimH = document.getElementById('dimH');
 const divisor = document.getElementById('divisor');
-const actualWeight = document.getElementById('actualWeight');
-const volWeightResult = document.getElementById('volWeightResult');
-const volWeightRoundedResult = document.getElementById('volWeightRoundedResult');
-const volWeightRoundedTag = document.getElementById('volWeightRoundedTag');
+
 const girthResult = document.getElementById('girthResult');
+const volWeightResult = document.getElementById('volWeightResult');
 const actualWeightRoundedTag = document.getElementById('actualWeightRoundedTag');
 const actualWeightRoundedResult = document.getElementById('actualWeightRoundedResult');
+const volWeightRoundedTag = document.getElementById('volWeightRoundedTag');
+const volWeightRoundedResult = document.getElementById('volWeightRoundedResult');
+const carrierTag = document.getElementById('carrierTag');
 const billableResult = document.getElementById('billableResult');
 const billableBasis = document.getElementById('billableBasis');
-const carrierTag = document.getElementById('carrierTag');
-const carrierDhlBtn = document.getElementById('carrierDhl');
-const carrierFedexBtn = document.getElementById('carrierFedex');
-
-let carrier = 'DHL'; // 'DHL' | 'FEDEX'
-
-function setCarrier(c){
-  carrier = c;
-  carrierDhlBtn.classList.toggle('active', c === 'DHL');
-  carrierFedexBtn.classList.toggle('active', c === 'FEDEX');
-  updateVolumetric();
-}
-carrierDhlBtn.addEventListener('click', () => setCarrier('DHL'));
-carrierFedexBtn.addEventListener('click', () => setCarrier('FEDEX'));
-
-// 반올림: DHL/FedEx 청구무게 규칙
-function billableRound(weightKg, carrierName){
-  if (weightKg <= 0) return 0;
-  if (carrierName === 'DHL') {
-    // 0.1~30kg: 0.5kg 단위 올림 / 30.1kg부터: 1kg 단위 올림
-    return weightKg > 30
-      ? Math.ceil(weightKg)
-      : Math.ceil(weightKg * 2) / 2;
-  } else {
-    // FedEx: 0.1~20.9kg: 0.5kg 단위 올림 / 21kg부터: 1kg 단위 올림
-    return weightKg >= 21
-      ? Math.ceil(weightKg)
-      : Math.ceil(weightKg * 2) / 2;
-  }
-}
 
 function updateVolumetric(){
+  const actual = parseFloat(actualWeight.value) || 0;
   const l = parseFloat(dimL.value) || 0;
   const w = parseFloat(dimW.value) || 0;
   const h = parseFloat(dimH.value) || 0;
   const div = parseFloat(divisor.value) || 5000;
-  const actual = parseFloat(actualWeight.value) || 0;
 
   const volWeight = (l * w * h) / div;
-  const volWeightRounded = billableRound(volWeight, carrier);
 
+  const longest = Math.max(l, w, h);
+  const others = [l, w, h].filter((_, i) => [l, w, h][i] !== longest || true);
+  // compute sum of the other two sides (excluding the longest, only once)
   const sides = [l, w, h];
-  const longest = Math.max(...sides);
-  const longestIdx = sides.indexOf(longest);
-  const others = sides.filter((_, i) => i !== longestIdx);
-  const girth = longest + 2 * (others[0] + others[1]);
-
-  volWeightResult.textContent = fmt(volWeight) + " kg";
-  volWeightRoundedTag.textContent = `부피중량(${carrier === 'DHL' ? 'DHL' : 'FedEx'} 반올림)`;
-  girthResult.textContent = fmt(girth) + " cm";
-  volWeightRoundedResult.textContent = fmt(volWeightRounded) + " kg";
+  const maxIdx = sides.indexOf(longest);
+  const rest = sides.filter((_, i) => i !== maxIdx);
+  const girth = longest + 2 * (rest[0] + rest[1]);
 
   const carrierLabel = carrier === 'DHL' ? 'DHL' : 'FedEx';
-  const actualWeightRounded = billableRound(actual, carrier);
+
+  const actualRounded = billableRound(actual, carrier);
+  const volRounded = billableRound(volWeight, carrier);
+
+  girthResult.textContent = fmt(girth) + " cm";
+  volWeightResult.textContent = fmt(volWeight) + " kg";
+
   actualWeightRoundedTag.textContent = `실중량(${carrierLabel} 반올림)`;
-  actualWeightRoundedResult.textContent = fmt(actualWeightRounded) + " kg";
+  actualWeightRoundedResult.textContent = fmt(actualRounded) + " kg";
 
-  const rawBillable = Math.max(volWeight, actual);
-  const billable = billableRound(rawBillable, carrier);
-  const basisLabel = volWeight >= actual ? "부피중량 기준" : "실중량 기준";
+  volWeightRoundedTag.textContent = `부피중량(${carrierLabel} 반올림)`;
+  volWeightRoundedResult.textContent = fmt(volRounded) + " kg";
 
-  carrierTag.textContent = (carrier === 'DHL' ? 'DHL' : 'FedEx') + ' 청구무게';
+  const billable = Math.max(actualRounded, volRounded);
+  const basisLabel = volRounded > actualRounded ? "부피중량 기준" : "실중량 기준";
+
+  carrierTag.textContent = `${carrierLabel} 청구무게`;
   billableResult.textContent = fmt(billable) + " kg";
   billableBasis.textContent = basisLabel;
 }
 
-[dimL, dimW, dimH, divisor, actualWeight].forEach((el) => {
+[actualWeight, dimL, dimW, dimH, divisor].forEach(el => {
   el.addEventListener('input', updateVolumetric);
-});
-divisor.addEventListener('change', updateVolumetric);
-
-updateVolumetric();
-
-// PWA install prompt (Android/Chrome)
-let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display = 'block';
-});
-installBtn.addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  installBtn.style.display = 'none';
-});
-window.addEventListener('appinstalled', () => {
-  installBtn.style.display = 'none';
+  el.addEventListener('change', updateVolumetric);
 });
 
-// Register service worker
+updateInch(); updateLb(); updateDelta(); updateVolumetric();
+
+// Service worker registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('./sw.js');
   });
 }
 </script>
