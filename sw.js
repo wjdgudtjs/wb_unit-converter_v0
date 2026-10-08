@@ -1,4 +1,4 @@
-const CACHE_NAME = 'unit-converter-v32';
+const CACHE_NAME = 'unit-converter-v33';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {
