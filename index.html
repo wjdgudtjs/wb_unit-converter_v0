@@ -58,6 +58,31 @@
     padding:20px 20px 22px;
     margin-bottom:16px;
   }
+  .card-label-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .card-label-row .card-label{
+    margin-bottom:0;
+    flex:1;
+  }
+  .reset-btn{
+    flex:none;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--text-muted);
+    font-size:11px;
+    font-weight:600;
+    padding:6px 10px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .reset-btn:hover{
+    border-color:var(--accent);
+    color:var(--accent);
+  }
   .card-label{
     font-size:11px;
     letter-spacing:0.12em;
@@ -403,7 +428,10 @@
   </div>
 
   <div class="card">
-    <div class="card-label">부피중량 · 청구무게</div>
+    <div class="card-label-row">
+      <div class="card-label">부피중량 · 청구무게</div>
+      <button type="button" class="reset-btn" id="resetBtn">초기화</button>
+    </div>
 
     <div class="carrier-divisor-row">
       <div class="carrier-group">
@@ -608,6 +636,16 @@ function updateVolumetric(){
 [actualWeight, dimL, dimW, dimH, divisor].forEach(el => {
   el.addEventListener('input', updateVolumetric);
   el.addEventListener('change', updateVolumetric);
+});
+
+const resetBtn = document.getElementById('resetBtn');
+resetBtn.addEventListener('click', () => {
+  actualWeight.value = '';
+  dimL.value = '';
+  dimW.value = '';
+  dimH.value = '';
+  divisor.value = '5000';
+  setCarrier('DHL');
 });
 
 updateInch(); updateLb(); updateDelta(); updateVolumetric();
